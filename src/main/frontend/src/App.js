@@ -1,4 +1,6 @@
 import {useEffect, useState, useRef} from 'react';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import Builder from './pages/active-learn/Builder';
 
 function App() {
   const socket = useRef(null);
@@ -33,19 +35,28 @@ function App() {
   };
 
   return (
-    <div>
-      <h2>웹소켓 통신</h2>
-      <input 
-        type='text'
-        value={inp}
-        onChange={(e) => setInput(e.target.value)}/>
-      <button onClick={sendMessage}>전송</button>
-      
-      <ul>{msg.map((msg, index) => (
-        <li key={index}>{msg}</li>
-      ))}</ul>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Builder/>}/>
+      </Routes>
+    </BrowserRouter>
   );
+
+  /* 웹소켓은 현재 사용하지 않으므로 주석 처리. */
+  // return (
+  //   <div>
+  //     <h2>웹소켓 통신</h2>
+  //     <input 
+  //       type='text'
+  //       value={inp}
+  //       onChange={(e) => setInput(e.target.value)}/>
+  //     <button onClick={sendMessage}>전송</button>
+      
+  //     <ul>{msg.map((msg, index) => (
+  //       <li key={index}>{msg}</li>
+  //     ))}</ul>
+  //   </div>
+  // );
 }
 
 export default App;
