@@ -20,4 +20,8 @@ const Title = styled(Typography)({
   fontSize: '18px',
 });
 
-export {Frame, ContainerDivider, Container, Title};
+const ButtonContainer = styled(Container)({
+  gap: '8px'
+})
+
+export {Frame, ContainerDivider, Container, Title, ButtonContainer};
