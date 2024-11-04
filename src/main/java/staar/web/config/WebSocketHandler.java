@@ -1,5 +1,7 @@
 package staar.web.config;
 
+import java.nio.file.FileAlreadyExistsException;
+
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -15,6 +17,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
   
   private static final String CLIENT_ID = "클라이언트 ID";
   private static final String ERR_RECEIVE = "프로그램 설정 응답을 받지 못했습니다.";
+  private static final String MSG_FAIL_INPUT = "[실패] 이미 존재하는 파일.";
+  private static final String MSG_SUCC_INPUT = "[성공] 입력 파일 [%s] 생성.";
 
   private final ObjectMapper mapper = new ObjectMapper();
 
@@ -44,9 +48,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
       System.out.println(config.toString());
 
       /* 작업 폴더에 프로그램 설정 입력 파일 생성. */
-      final String inputPath = String.format("%s/input.txt", config.getWorkDirPath());
-      FileSystemManager.makeDirectory(config.getWorkDirPath());
-      FileSystemManager.makeFile(inputPath, InputGenerator.getInstance(config).generateInput());
+      try {
+        final String inputPath = String.format("%s/input.txt", config.getWorkDirPath());
+        FileSystemManager.makeDirectory(config.getWorkDirPath());
+        FileSystemManager.makeFile(inputPath, InputGenerator.getInstance(config).generateInput());
+        session.sendMessage(new TextMessage(String.format(MSG_SUCC_INPUT, inputPath)));
+      } catch (Exception e) {
+        session.sendMessage(new TextMessage(MSG_FAIL_INPUT));
+      }
     }
   }
 }

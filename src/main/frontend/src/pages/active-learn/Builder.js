@@ -1,8 +1,9 @@
-import {ButtonContainer, ContainerDivider, Frame, Title} from '../../layouts/Frame';
+import {ContainerDivider, Frame, Title} from '../../layouts/Frame';
 import Menu from '../../components/common/Menu';
 import {OptFolder, OptModel, OptTrace, OptTarget, OptWorkDir, OptBenchmark, OptNoConst, OptTeacher} from '../../components/active-learn/Option';
 import {ProgramContextProvider} from '../../components/active-learn/ProgramContext';
-import {GenInputButton, RunButton} from '../../components/active-learn/SubmitButton';
+import MessageViewer from '../../components/common/MessageViewer';
+import { BuildButtons } from '../../components/active-learn/SubmitButton';
 
 export default function Builder() {
   return (
@@ -32,10 +33,7 @@ export default function Builder() {
         </div>
         <ContainerDivider/>
         <div className='buttons'>
-          <ButtonContainer>
-            <GenInputButton/>
-            <RunButton/>
-          </ButtonContainer>
+          <BuildButtons/>
         </div>
       </ProgramContextProvider>
     </Frame>

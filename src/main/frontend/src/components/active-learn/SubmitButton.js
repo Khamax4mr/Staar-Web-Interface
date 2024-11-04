@@ -1,9 +1,10 @@
-import {useEffect, useRef} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {useProgramContext} from './ProgramContext';
+import {ButtonContainer, Message} from '../../layouts/Frame';
 import {ClickBox} from '../../layouts/Field';
 
 /* 프로그램 설정, 옵션으로 능동 학습 실행 입력 파일 구성. */
-function GenInputButton() {
+function GenInputButton({setMsg}) {
   const socket = useRef(null);
   const {programDir, targetName, workDir, benchmark, noConst, teacher} = useProgramContext();
 
@@ -11,6 +12,12 @@ function GenInputButton() {
   useEffect(() => {
     let url = "ws://localhost:15535/ws";
     socket.current = new WebSocket(url);
+
+    /* 서버 응답 반응 시 메세지 갱신. */
+    socket.current.onmessage = (e) => {
+      console.log(e);
+      setMsg(e.data);
+    };
 
     /* 웹소켓 통신 불가 알림. */
     socket.current.onclose = () => {
@@ -37,7 +44,6 @@ function GenInputButton() {
 
 /* 프로그램 설정, 옵션으로 능동 학습 수행. */
 function RunButton() {
-
   /* 로그 출력. */
   /* Todo: ActiveLearnRunner 페이지 전환. */
   const onClick = () => {
@@ -49,4 +55,17 @@ function RunButton() {
   );
 }
 
-export {GenInputButton, RunButton};
+function BuildButtons() {
+  const [msg, setMsg] = useState('');
+  
+  return(
+    <div>
+      <ButtonContainer>
+        <GenInputButton setMsg={setMsg}/>
+        <RunButton/>
+      </ButtonContainer>
+      {msg}
+    </div>
+  );
+}
+export {BuildButtons};
