@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.js": "/Staar-Web-Interface/static/js/main.d867a789.js",
+    "static/js/453.8ab44547.chunk.js": "/Staar-Web-Interface/static/js/453.8ab44547.chunk.js",
+    "index.html": "/Staar-Web-Interface/index.html",
+    "main.d867a789.js.map": "/Staar-Web-Interface/static/js/main.d867a789.js.map",
+    "453.8ab44547.chunk.js.map": "/Staar-Web-Interface/static/js/453.8ab44547.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.d867a789.js"
+  ]
+}
