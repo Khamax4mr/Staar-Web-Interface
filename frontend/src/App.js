@@ -1,5 +1,7 @@
-import {useEffect, useState, useRef, Suspense} from 'react';
+import {lazy, useEffect, useState, useRef, Suspense} from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
+
+const BMSelector = lazy(() => import('./pages/BMSelector'));
 
 function WebSocketApp() {
   const socket = useRef(null);
@@ -55,7 +57,7 @@ const App = () => (
   <BrowserRouter basename={process.env.PUBLIC_URL}>
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
-        <Route path='/' element={<WebSocketApp/>}/>
+        <Route path='/' element={<BMSelector/>}/>
       </Routes>
     </Suspense>
   </BrowserRouter>
