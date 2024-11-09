@@ -2,10 +2,15 @@ import {HeaderSimpleMenu, FooterSelectMenu} from '../components/common/Menu';
 import {BenchmarkList, VariableList} from '../components/active-learn/List';
 import {ProgramContextProvider} from '../components/active-learn/ProgramContext';
 import {Frame, Container} from '../layouts/Frame';
+import {getDirectFolders} from '../components/common/FileBrowser';
+
+let benchmark_path = '/home/shared';
 
 export default function BMSelector() {
-  const conWidth = `calc(100vw - 500px)`;
-  const conHeight = `calc(100vh - 120px)`;
+  let conWidth = `calc(100vw - 500px)`;
+  let conHeight = `calc(100vh - 120px)`;
+
+  const results = getDirectFolders(benchmark_path);
 
   return(
     <Frame>
