@@ -15,11 +15,18 @@ public final class Const {
   /* 토픽 경로. */
   public static final class TOPIC {
     public static final String BASE = "/topic";
+    public static final String DIR_FOLDER = BASE + "/dir-folder";
   }
 
   /* 엔드포인트 경로. */
   public static final class ENDPOINT {
     public static final String WS = "/ws";
     public static final String FS = "/fs";
+  }
+
+  /* 메세지 키. */
+  public static final class KEY {
+    public static final String PATH = "path";
+    public static final String FOLDER = "folder";
   }
 }

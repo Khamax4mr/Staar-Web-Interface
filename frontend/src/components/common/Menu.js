@@ -1,3 +1,4 @@
+import {useProgramContext} from '../active-learn/ProgramContext';
 import {Bar, Button, Container, Title} from '../../layouts/Menu';
 
 function FileButton({name}) {
@@ -22,9 +23,20 @@ function LanguageButton({name}) {
 };
 
 function RunButton({name}) {
+  /* 선택한 벤치마크 ID, 변수 ID. */
+  const {benchmarkId, variableId} = useProgramContext();
+
+  /* 버튼 클릭 시 동작. */
+  const onClick = () => {
+    /* 벤치마크, 변수를 선택하면 수행. */
+    if (benchmarkId && variableId) {
+      /* Todo: 능동학습 수행 페이지로 이동. */
+      console.log('선택한 벤치마크:', benchmarkId, variableId);
+    }
+  };
+
   return (
-    /* Todo: 능동학습 수행 페이지로 이동. */
-    <Button>{name}</Button>
+    <Button onClick={onClick}>{name}</Button>
   );
 }
 
