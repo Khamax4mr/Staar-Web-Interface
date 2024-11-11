@@ -9,7 +9,7 @@ public final class Const {
     public static final String FRONT_HOME_REL = "/";
     public static final String FRONT_HOME_DIR = "https://khamax4mr.github.io/Staar-Web-Interface/";
     public static final String BACK_HOME_REL = "/";
-    public static final String BACK_HOME_DIR = "http://localhost:8080";
+    public static final String BACK_HOME_DIR = "https://155.230.34.189:15535";
   }
 
   /* 토픽 경로. */

@@ -1,7 +1,7 @@
 import {Client} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-let url = 'http://localhost:15535/ws';
+let url = 'https://155.230.34.189:15535/ws';
 let topic_direct_folder = '/topic/dir-folder';
 let dest_end_point = '/fs';
 

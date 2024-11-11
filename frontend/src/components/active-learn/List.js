@@ -3,7 +3,7 @@ import {List, ListItemButton, ListSubheader} from "@mui/material";
 import {useProgramContext} from './ProgramContext';
 import {getDirectFolders} from '../common/FileBrowser';
 
-let benchmark_source_path = '/home/shared';
+let benchmark_source_path = '/home/shared/AL_benchmark';
 
 function BenchmarkList({name}) {
   /* 선택한 벤치마크 ID, 초기화할 변수 ID. */
