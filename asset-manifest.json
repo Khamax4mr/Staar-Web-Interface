@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.js": "/Staar-Web-Interface/static/js/main.5369af9d.js",
-    "static/js/907.6dd7dd77.chunk.js": "/Staar-Web-Interface/static/js/907.6dd7dd77.chunk.js",
+    "main.js": "/Staar-Web-Interface/static/js/main.73ef0463.js",
+    "static/js/907.697be068.chunk.js": "/Staar-Web-Interface/static/js/907.697be068.chunk.js",
     "static/js/453.d855a71b.chunk.js": "/Staar-Web-Interface/static/js/453.d855a71b.chunk.js",
     "static/js/206.32ebbc9c.chunk.js": "/Staar-Web-Interface/static/js/206.32ebbc9c.chunk.js",
     "index.html": "/Staar-Web-Interface/index.html",
-    "main.5369af9d.js.map": "/Staar-Web-Interface/static/js/main.5369af9d.js.map",
-    "907.6dd7dd77.chunk.js.map": "/Staar-Web-Interface/static/js/907.6dd7dd77.chunk.js.map",
+    "main.73ef0463.js.map": "/Staar-Web-Interface/static/js/main.73ef0463.js.map",
+    "907.697be068.chunk.js.map": "/Staar-Web-Interface/static/js/907.697be068.chunk.js.map",
     "453.d855a71b.chunk.js.map": "/Staar-Web-Interface/static/js/453.d855a71b.chunk.js.map",
     "206.32ebbc9c.chunk.js.map": "/Staar-Web-Interface/static/js/206.32ebbc9c.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.5369af9d.js"
+    "static/js/main.73ef0463.js"
   ]
 }
