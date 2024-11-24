@@ -1,90 +1,70 @@
-import {Client} from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import {useEffect, useState} from 'react';
+import {List, ListItemButton, ListSubheader} from "@mui/material";
+import {getDirectFolders} from '../common/FileFetcher';
 
-let url = 'https://localhost:15535/ws';
-let topic_fs = '/fs';
-let dest_fs_dir_folder = '/fs/dir-folder';
-let dest_fs_json_file = '/fs/json-file';
+/* 상위 폴더 경로. */
+let parent_path = '..';
 
-class FileBrowser {
-  constructor(socket) {
-    this.socket = socket;
-    this.stomp = null;
-  }
+function FolderBrowser({title, root, setTarget}) {
+  /* 컴포넌트 마운트 시 수행 동작. 하위 폴더 불러오기. */
+  const [path, setPath] = useState([]);
+  const [contents, setContents] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  /* STOMP 웹 소켓 통신 연결. */
-  connect() {
-    return new Promise((resolve, reject) => {
-      this.stomp = new Client({
-        webSocketFactory: () => this.socket,
-        onConnect: () => {
-          console.log('서버 연결 성공');
-          resolve();
-        },
-        onError: (frame) => {
-          console.error('서버 연결 실패', frame);
-          reject(new Error(frame.headers['message']));
-        },
-        /* 콘솔 출력 디버그용. */
-        // debug: (msg) => console.log(msg),
-      });
-      this.stomp.activate();
-    }); 
-  }
-
-  /* STOMP 웹 소켓 통신 종료. */
-  disconnected() {
-    if (this.stomp) {
-      console.log('서버 연결 종료');
-      this.stomp.deactivate();
-    }
-  }
-  
-  /* 서버로 경로 정보 전달. */
-  getMessage(topic, dest, path) {
-    return new Promise(async (resolve, reject) => {
-      if (!this.stomp || !this.stomp.connected) {
-        try {
-          await this.connect();
-        } catch (err) {
-          return reject(err);
-        }
+  useEffect(() => {
+    let wd_path = [root, ...path].join("/");
+    getDirectFolders(wd_path).then((result) => {
+      if (path.length > 0) {
+        setContents([parent_path, ...result]);
+      } else {
+        setContents(result);
       }
-
-      /* topic 구독. */
-      const subscription = this.stomp.subscribe(topic, (msg) => {
-        console.log(topic, dest, '수신');
-        if (msg.body) {
-          const results = JSON.parse(msg.body);
-          resolve(results);
-          subscription.unsubscribe();
-        }
-      });
-
-      /* 엔드 포인트 /fs로 정보 전송. */
-      this.stomp.publish({
-        destination: dest,
-        body: JSON.stringify({path: path}),
-      });
-      console.log(topic, dest, '전송');
+    }).catch(e => {
+      if (path.length > 0) {
+        setContents([parent_path]);
+      } else {
+        setContents([]);
+      }
+    }).finally(e => {
+      /* 대기 상태 종료. */
+      setLoading(false);
+      setTarget(null);
     });
+  }, [path]);
+
+  /* 클릭 폴더 설정. */
+  const onClick = (e, id) => {
+    setTarget([root, ...path, id].join('/'));
+  };
+
+  /* 현재 폴더 경로 변경. */
+  const onDoubleClick = (e, id) => {
+    if (loading === false) {
+      if (id === parent_path) {
+        setPath(path.slice(0, -1))
+      } else {
+        setPath([...path, id]);
+      }
+    }
+    setLoading(true);
   }
+
+  /* 연속 리스트 버튼 생성. */
+  const nameList = contents.map((name) =>
+    <ListItemButton key={name}
+      selected={path === name}
+      onClick={(e) => onClick(e, name)}
+      onDoubleClick={(e) => onDoubleClick(e, name)}>
+      {name}
+    </ListItemButton>
+  );
+
+  return(
+    <List sx={{padding:'0px', width: '100%', overflowY: 'auto'}}>
+      <ListSubheader>{title}</ListSubheader>
+      {nameList}
+    </List>
+  );
 }
 
-async function getDirectFolders(path) {
-  const socket = new SockJS(url);
-  const browser = new FileBrowser(socket);
-  console.log('직접 하위 폴더 탐색 요청');
-
-  try {
-    const result = await browser.getMessage(topic_fs, dest_fs_dir_folder, path);
-    return (result.folder) ? result.folder : [];
-  } catch (err) {
-    console.err('파일 탐색기 오류:', err);
-    return [];
-  } finally {
-    browser.disconnected();
-  }
-}
-
-export {getDirectFolders};
+export {FolderBrowser};
