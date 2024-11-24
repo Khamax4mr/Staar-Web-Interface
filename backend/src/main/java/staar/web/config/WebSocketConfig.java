@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   /* /topic의 구독을 대상으로, 클라이언트 / 경로를 목적지로 둔 STOMP 브로커를 구성합니다. */
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
-    config.enableSimpleBroker(TOPIC.BASE);
+    config.enableSimpleBroker(TOPIC.FS);
     config.setApplicationDestinationPrefixes(HOME.FRONT_HOME_REL);
   }
 }

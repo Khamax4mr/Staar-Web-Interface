@@ -1,9 +1,10 @@
 import {Client} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-let url = 'https://155.230.34.189:15535/ws';
-let topic_direct_folder = '/topic/dir-folder';
-let dest_end_point = '/fs';
+let url = 'https://localhost:15535/ws';
+let topic_fs = '/fs';
+let dest_fs_dir_folder = '/fs/dir-folder';
+let dest_fs_json_file = '/fs/json-file';
 
 class FileBrowser {
   constructor(socket) {
@@ -40,7 +41,7 @@ class FileBrowser {
   }
   
   /* 서버로 경로 정보 전달. */
-  getMessage(topic, path) {
+  getMessage(topic, dest, path) {
     return new Promise(async (resolve, reject) => {
       if (!this.stomp || !this.stomp.connected) {
         try {
@@ -52,7 +53,7 @@ class FileBrowser {
 
       /* topic 구독. */
       const subscription = this.stomp.subscribe(topic, (msg) => {
-        console.log(dest_end_point, topic, '수신');
+        console.log(topic, dest, '수신');
         if (msg.body) {
           const results = JSON.parse(msg.body);
           resolve(results);
@@ -62,10 +63,10 @@ class FileBrowser {
 
       /* 엔드 포인트 /fs로 정보 전송. */
       this.stomp.publish({
-        destination: dest_end_point,
+        destination: dest,
         body: JSON.stringify({path: path}),
       });
-      console.log(dest_end_point, topic, '전송');
+      console.log(topic, dest, '전송');
     });
   }
 }
@@ -76,7 +77,7 @@ async function getDirectFolders(path) {
   console.log('직접 하위 폴더 탐색 요청');
 
   try {
-    const result = await browser.getMessage(topic_direct_folder, path);
+    const result = await browser.getMessage(topic_fs, dest_fs_dir_folder, path);
     return (result.folder) ? result.folder : [];
   } catch (err) {
     console.err('파일 탐색기 오류:', err);

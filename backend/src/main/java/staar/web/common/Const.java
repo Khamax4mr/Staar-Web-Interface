@@ -9,19 +9,20 @@ public final class Const {
     public static final String FRONT_HOME_REL = "/";
     public static final String FRONT_HOME_DIR = "https://khamax4mr.github.io/Staar-Web-Interface/";
     public static final String BACK_HOME_REL = "/";
-    public static final String BACK_HOME_DIR = "https://155.230.34.189:15535";
+    public static final String BACK_HOME_DIR = "https://localhost:15535";
+    // public static final String BACK_HOME_DIR = "https://155.230.34.189:15535";
   }
 
   /* 토픽 경로. */
   public static final class TOPIC {
-    public static final String BASE = "/topic";
-    public static final String DIR_FOLDER = BASE + "/dir-folder";
+    public static final String FS = "/fs";
   }
 
   /* 엔드포인트 경로. */
   public static final class ENDPOINT {
     public static final String WS = "/ws";
-    public static final String FS = "/fs";
+    public static final String DIR_FOLDER = TOPIC.FS + "/dir-folder";
+    public static final String JSON_FILE = TOPIC.FS + "/json-file";
   }
 
   /* 메세지 키. */

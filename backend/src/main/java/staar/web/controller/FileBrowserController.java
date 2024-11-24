@@ -30,13 +30,13 @@ public class FileBrowserController {
   private final static String Err_Processing = "Json 형식 구성 오류 발생";
 
   /** msg에서 path 키의 값에 해당하는 경로의 직접 하위 폴더 이름을 반환합니다.
-   * /fs 엔드 포인트 요청에 대하여 /topic/dir-folder을 구독한 클라이언트를 대상으로 동작합니다.
+   * /fs를 구독한 클라이언트를 대상으로 /fs/dir-folder 엔드 포인트 동작을 수행합니다.
    * @param msg Json 형식 문자열
    * @return 폴더 이름 목록 Json 형식 문자열 */
-  @MessageMapping(ENDPOINT.FS)
-  @SendTo(TOPIC.DIR_FOLDER)
+  @MessageMapping(ENDPOINT.DIR_FOLDER)
+  @SendTo(TOPIC.FS)
   public String getDirectFolder(String msg) {
-    System.out.println(String.format(Msg_Publish, ENDPOINT.FS, TOPIC.DIR_FOLDER));
+    System.out.println(String.format(Msg_Publish, ENDPOINT.DIR_FOLDER, TOPIC.FS));
 
     /* path 키 값이 없으면 null을 반환하며 종료. */
     final Map<String, Object> json = convert2Map(msg);
@@ -71,7 +71,7 @@ public class FileBrowserController {
     final Map<String, Object> map = new HashMap<>();
     try {
       final ObjectMapper mapper = new ObjectMapper();
-      map.putAll(mapper.readValue(msg,new TypeReference<Map<String, Object>>(){}));
+      map.putAll(mapper.readValue(msg, new TypeReference<Map<String, Object>>(){}));
     } catch (JsonMappingException e) {
       System.out.println(Err_Mapping);
       e.printStackTrace();

@@ -40,7 +40,11 @@ public class FileBrowser {
       return instance;
     }
     /* 찾은 파일을 파일 리스트에 추가. */
-    files.addAll(Arrays.asList(base.listFiles()));
+    if (base.isDirectory()) {
+      files.addAll(Arrays.asList(base.listFiles()));
+    } else {
+      files.add(base);
+    }
     return instance;
   }
 
@@ -71,6 +75,16 @@ public class FileBrowser {
       else if (file.getName().equals("code")) iter.remove();
     }
     return instance;
+  }
+
+  /** id 번호의 파일을 반환합니다.
+   * @param id 번호
+   * @return 파일 */
+  public File getFile(int id) {
+    if (files.size() <= id) {
+      return null;
+    }
+    return files.get(id);
   }
 
   /** 파일 리스트를 반환합니다.
