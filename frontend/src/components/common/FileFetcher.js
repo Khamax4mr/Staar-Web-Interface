@@ -87,4 +87,20 @@ async function getDirectFolders(path) {
   }
 }
 
-export {getDirectFolders};
+async function getJsonFile(path) {
+  const socket = new SockJS(url);
+  const browser = new FileFetcher(socket);
+  console.log('특정 Json 파일 탐색 요청');
+
+  try {
+    const result = await browser.getMessage(topic_fs, dest_fs_json_file, path);
+    return result;
+  } catch (err) {
+    console.err('파일 탐색기 오류:', err);
+    return null;
+  } finally {
+    browser.disconnected();
+  }
+}
+
+export {getDirectFolders, getJsonFile};

@@ -1,6 +1,7 @@
 package staar.web.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +27,6 @@ import staar.web.common.Const.TOPIC;
 public class FileBrowserController {
 
   private final static String Msg_Publish = "엔드 포인트 %s로 %s 토픽 메세지 발생";
-  private final static String Err_Mapping = "맵 자료형 매핑 오류 발생";
   private final static String Err_Processing = "Json 형식 구성 오류 발생";
 
   /** msg에서 path 키의 값에 해당하는 경로의 직접 하위 폴더 이름을 반환합니다.
@@ -64,6 +64,37 @@ public class FileBrowserController {
     }
   }
 
+ /** msg에서 path 키의 값에 해당하는 경로의 직접 하위 폴더 이름을 반환합니다.
+   * /fs를 구독한 클라이언트를 대상으로 /fs/json-file 엔드 포인트 동작을 수행합니다.
+   * @param msg Json 형식 문자열
+   * @return 폴더 이름 목록 Json 형식 문자열 */
+  @MessageMapping(ENDPOINT.JSON_FILE)
+  @SendTo(TOPIC.FS)
+  public String getJsonFile(String msg) {
+    System.out.println(String.format(Msg_Publish, ENDPOINT.JSON_FILE, TOPIC.FS));
+
+    /* path 키 값이 없으면 null을 반환하며 종료. */
+    final Map<String, Object> json = convert2Map(msg);
+    if (!json.containsKey(KEY.PATH)) return null;
+    /* 직접 Json 파일 찾기. */
+    final String path = json.get(KEY.PATH).toString();
+    final File jsonFile = FileBrowser.getInstance().search(path).getFile(0);
+
+    /* 구독 클라이언트에게 Json 파일 내용 메세지 전달. */
+    final ObjectMapper mapper = new ObjectMapper();
+    final Map<String, Object> result = new HashMap<>();
+
+    try {
+      result.putAll(mapper.readValue(jsonFile, new TypeReference<Map<String, Object>>() {}));
+      return mapper.writeValueAsString(result);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    }
+    return "{}";
+  }
+
   /** Json 형식 문자열 msg를 Json 키, 값에 대응하는 <String, Object> 맵으로 변환합니다.
    * @param msg Json 형식 문자열
    * @return <String, Object> 맵 */
@@ -73,11 +104,11 @@ public class FileBrowserController {
       final ObjectMapper mapper = new ObjectMapper();
       map.putAll(mapper.readValue(msg, new TypeReference<Map<String, Object>>(){}));
     } catch (JsonMappingException e) {
-      System.out.println(Err_Mapping);
       e.printStackTrace();
+      return null;
     } catch (JsonProcessingException e) {
-      System.out.println(Err_Processing);
       e.printStackTrace();
+      return null;
     }
     return map;
   }

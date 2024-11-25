@@ -48,6 +48,19 @@ public class FileBrowser {
     return instance;
   }
 
+  /** file의 파일 리스트를 찾은 파일 탐색기를 반환합니다.
+   * @param file 파일
+   * @return 파일 탐색기 인스턴스 */
+  public FileBrowser search(File file) {
+    /* 찾은 파일을 파일 리스트에 추가. */
+    if (file.isDirectory()) {
+      files.addAll(Arrays.asList(file.listFiles()));
+    } else {
+      files.add(file);
+    }
+    return instance;
+  }
+
   /** 파일 리스트에서 폴더가 아닌 파일을 제외한 파일 탐색기를 반환합니다.
    * @return 파일 탐색기 인스턴스 */
   public FileBrowser filterFolder() {
