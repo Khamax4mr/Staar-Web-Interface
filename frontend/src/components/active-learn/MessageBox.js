@@ -19,7 +19,7 @@ function TargetInfoBox() {
 }
 
 function LogBox() {
-  let log_test_message = "Todo: 로그 출력.";
+  let log_test_message = "";
   return log_test_message;
 }
 
