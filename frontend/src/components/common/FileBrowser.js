@@ -1,75 +1,72 @@
 import {useEffect, useState} from 'react';
 import {List, ListItemButton, ListSubheader} from "@mui/material";
-import {getDirectFolders, getJsonFile} from '../common/FileFetcher';
+import {getDirectFolders} from '../common/FileFetcher';
 
-/* 상위 폴더 경로. */
-let parent_path = '..';
-let meta_path = 'meta.json';
-let is_runnable = 'isRunnable';
+let home_path = '/home';  /* 홈 폴더 경로. */
+let parent_path = '..';   /* 상위 폴더 경로. */
 
-function FolderBrowser({title, root, id, setId, setTarget}) {
-  /* 컴포넌트 마운트 시 수행 동작. 하위 폴더 불러오기. */
-  const [path, setPath] = useState([]);
-  const [contents, setContents] = useState([]);
+function FolderBrowser({root, wd, setPath, blocked}) {
+  /* 작업 폴더 목록, 선택 파일 내용. */
+  let browser_root = home_path;
+  const [workDir, setWorkDir] = useState([]);
+  const [content, setContent] = useState([]);
+  const [selectItem, setSelectItem] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    let wd_path = [root, ...path].join('/');
-    getDirectFolders(wd_path).then((result) => {
-      if (path.length > 0) {
-        setContents([parent_path, ...result]);
-      } else {
-        setContents(result);
-      }
-    }).catch(e => {
-      if (path.length > 0) {
-        setContents([parent_path]);
-      } else {
-        setContents([]);
-      }
-    }).finally(e => {
-      /* 대기 상태 종료. */
-      setLoading(false);
-      setId(null);
-      setTarget(null);
-    });
-  }, [path]);
+  /* 입력 속성으로 상태 설정. */
+  if (root) browser_root = root;
+  if (wd) setWorkDir(wd.split('/').filter(Boolean));
 
-  /* 클릭 폴더 설정. */
+  /* 컴포넌트 마운트 및 작업 폴더 변경 시 수행 동작. 하위 폴더 정보 불러오기. */
+  useEffect(() => {
+    /* 하위 폴더라면 상위 폴더 이동 선택지 .. 추가. */
+    let previous = (workDir.length > 0) ? [parent_path] : [];
+
+    /* 하위 폴더 정보 불러오기. */
+    let wd_path = [root, ...workDir].join('/');
+    getDirectFolders(wd_path).then((result) => {
+      setContent([...previous, ...result]);
+    }).catch(e => {
+    }).finally(e => {
+      // if (typeof setPath === 'function') setPath(null);
+      setSelectItem(null);
+      setLoading(false);
+    });
+  }, [workDir]);
+
+  /* 컴포넌트 마운트 및 폴더 선택 시 수행 동작. 경로 전달. */
+  useEffect(() => {
+    if (typeof setPath === 'function') {
+      if (selectItem) setPath([browser_root, ...workDir, selectItem]);
+      else setPath([browser_root, ...workDir]);
+    }
+  }, [selectItem]);
+
+  /* 클릭 시 폴더 정보 가져오기. */
   const onClick = (e, id) => {
-    if (id === parent_path) {
-      setId(null);
-      setTarget(null);
-    } else {
-      setId(id);
-      setTarget([root, ...path, id].join('/'));
+    if (selectItem !== id) {
+      if (parent_path === id) setSelectItem(null);
+      else setSelectItem(id);
     }
   };
 
-  /* 현재 폴더 경로 변경. */
+  /* 더블 클릭 시 현재 폴더 경로 변경. */
   const onDoubleClick = (e, id) => {
     if (loading === false) {
       if (id === parent_path) {
-        setPath(path.slice(0, -1));
+        setWorkDir(workDir.slice(0, -1));
         setLoading(true);
-      } else {
-        let wd_meta_path = [root, ...path, id, meta_path].join('/');
-        getJsonFile(wd_meta_path).then((result) => {
-          if (result.hasOwnProperty(is_runnable)) {
-            if (result.isRunnable === false) {   
-              setPath([...path, id]);
-              setLoading(true);
-            }
-          }
-        });
+      } else if (blocked === false) {
+        setWorkDir([...workDir, id]);
+        setLoading(true);
       }
     }
   }
 
   /* 연속 리스트 버튼 생성. */
-  const nameList = contents.map((name) =>
+  const nameList = content.map((name) =>
     <ListItemButton key={name}
-      selected={id === name}
+      selected={selectItem === name}
       onClick={(e) => onClick(e, name)}
       onDoubleClick={(e) => onDoubleClick(e, name)}>
       {name}
@@ -78,7 +75,6 @@ function FolderBrowser({title, root, id, setId, setTarget}) {
 
   return(
     <List sx={{padding:'0px', width: '100%', overflowY: 'auto'}}>
-      <ListSubheader>{title}</ListSubheader>
       {nameList}
     </List>
   );
