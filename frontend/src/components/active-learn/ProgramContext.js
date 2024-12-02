@@ -6,13 +6,13 @@ const ProgramContext = createContext();
 function ProgramContextProvider({children}) {
   const [benchmarkPath, setBenchmarkPath] = useState([]);
   const [benchmarkDesc, setBenchmarkDesc] = useState(null);
-  const [clickedBenchmark, setClickedBenchmark] = useState([]);
+  const [runnable, setRunnable] = useState(false);
 
   return (
     <ProgramContext.Provider value={{
         benchmarkPath, setBenchmarkPath,
         benchmarkDesc, setBenchmarkDesc,
-        clickedBenchmark, setClickedBenchmark}}>
+        runnable, setRunnable}}>
       {children}
     </ProgramContext.Provider>
   );
