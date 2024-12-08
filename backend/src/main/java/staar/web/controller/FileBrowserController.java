@@ -1,10 +1,7 @@
 package staar.web.controller;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,7 +13,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import staar.fs.ExcludeRule;
 import staar.fs.FileBrowser;
+import staar.fs.common.Const.PATH;
+import staar.fs.common.Const.TYPE;
+import staar.fs.tree.FileTreeItemFactory;
+import staar.fs.tree.FileTreeVisitor;
+import staar.fs.tree.FolderItem;
 import staar.web.common.Const.ENDPOINT;
 import staar.web.common.Const.KEY;
 import staar.web.common.Const.TOPIC;
@@ -26,7 +29,6 @@ import staar.web.common.Const.TOPIC;
 public class FileBrowserController {
 
   private final static String Msg_Publish = "엔드 포인트 %s로 %s 토픽 메세지 발생";
-  private final static String Err_Mapping = "맵 자료형 매핑 오류 발생";
   private final static String Err_Processing = "Json 형식 구성 오류 발생";
 
   /** msg에서 path 키의 값에 해당하는 경로의 직접 하위 폴더 이름을 반환합니다.
@@ -42,16 +44,24 @@ public class FileBrowserController {
     final Map<String, Object> json = convert2Map(msg);
     if (!json.containsKey(KEY.PATH)) return null;
 
-    /* 직접 하위 폴더 이름 찾기. */
+    /* 파일을 찾을 수 없으면 null을 반환하며 종료. */
     final String path = json.get(KEY.PATH).toString();
-    final List<String> names = new ArrayList<>();
-    names.addAll(FileBrowser.getInstance().search(path).filterFolder().filterCommon().getFiles()
-                            .stream().map(File::getName).toList());
-    Collections.sort(names);
+    final File targetFile = FileBrowser.getInstance().search(path);
+    if (targetFile == null) return null;
 
-    /* 클라이언트에게 보낼 직접 하위 폴더 이름 리스트 메세지 구성. */
+    /* 제외 목록 구성. */
+    final ExcludeRule rule = new ExcludeRule();
+    rule.addExcludedName(PATH.COMMON);
+    rule.addExcludedName(PATH.CODE);
+    rule.addExcludedType(TYPE.FILE);
+
+    /* 폴더 구성 요소를 만들지 못하면 null을 반환하며 종료. */
+    final FolderItem targetItem = (FolderItem)new FileTreeItemFactory(rule).createItem(targetFile);
+    if (targetItem == null) return null;
+    
+    /* 직접 하위 파일 목록 기록. */
     final Map<String, Object> result = new HashMap<>();
-    result.put(KEY.FOLDER, names);
+    result.putAll(targetItem.toJson(new FileTreeVisitor()));
 
     /* 구독 클라이언트에게 직접 하위 폴더 이름 리스트 메세지 전달. */
     try {
@@ -71,13 +81,14 @@ public class FileBrowserController {
     final Map<String, Object> map = new HashMap<>();
     try {
       final ObjectMapper mapper = new ObjectMapper();
+      // mapper.readTree
       map.putAll(mapper.readValue(msg, new TypeReference<Map<String, Object>>(){}));
     } catch (JsonMappingException e) {
-      System.out.println(Err_Mapping);
       e.printStackTrace();
+      return null;
     } catch (JsonProcessingException e) {
-      System.out.println(Err_Processing);
       e.printStackTrace();
+      return null;
     }
     return map;
   }

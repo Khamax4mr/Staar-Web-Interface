@@ -1,90 +1,82 @@
-import {Client} from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import {useEffect, useState} from 'react';
+import {List, ListItemButton} from "@mui/material";
+import {getDirectFolders} from '../common/FileFetcher';
 
-let url = 'https://localhost:15535/ws';
-let topic_fs = '/fs';
-let dest_fs_dir_folder = '/fs/dir-folder';
-let dest_fs_json_file = '/fs/json-file';
+let home_path = '/home';  /* 홈 폴더 경로. */
+let parent_path = '..';   /* 상위 폴더 경로. */
 
-class FileBrowser {
-  constructor(socket) {
-    this.socket = socket;
-    this.stomp = null;
-  }
+function FolderBrowser({root, wd, setPath}) {
+  /* 작업 폴더 목록, 선택 파일 내용. */
+  let browser_root = home_path;
+  const [workDir, setWorkDir] = useState([]);
+  const [content, setContent] = useState([]);
+  const [selectItem, setSelectItem] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  /* STOMP 웹 소켓 통신 연결. */
-  connect() {
-    return new Promise((resolve, reject) => {
-      this.stomp = new Client({
-        webSocketFactory: () => this.socket,
-        onConnect: () => {
-          console.log('서버 연결 성공');
-          resolve();
-        },
-        onError: (frame) => {
-          console.error('서버 연결 실패', frame);
-          reject(new Error(frame.headers['message']));
-        },
-        /* 콘솔 출력 디버그용. */
-        // debug: (msg) => console.log(msg),
-      });
-      this.stomp.activate();
-    }); 
-  }
+  /* 입력 속성으로 상태 설정. */
+  if (root) browser_root = root;
+  if (wd) setWorkDir(wd.split('/').filter(Boolean));
 
-  /* STOMP 웹 소켓 통신 종료. */
-  disconnected() {
-    if (this.stomp) {
-      console.log('서버 연결 종료');
-      this.stomp.deactivate();
+  /* 컴포넌트 마운트 및 작업 폴더 변경 시 수행 동작. 하위 폴더 정보 불러오기. */
+  useEffect(() => {
+    /* 하위 폴더라면 상위 폴더 이동 선택지 .. 추가. */
+    let previous = (workDir.length > 0) ? [parent_path] : [];
+
+    /* 하위 폴더 정보 불러오기. */
+    let wd_path = [root, ...workDir].join('/');
+    getDirectFolders(wd_path).then((result) => {
+      setContent([...previous, ...result]);
+    }).catch(e => {
+    }).finally(e => {
+      setSelectItem(null);
+      setLoading(false);
+    });
+  }, [workDir]);
+
+  /* 컴포넌트 마운트 및 폴더 선택 시 수행 동작. 경로 전달. */
+  useEffect(() => {
+    if (typeof setPath === 'function') {
+      if (selectItem) setPath([browser_root, ...workDir, selectItem]);
+      else setPath([browser_root, ...workDir]);
+    }
+  }, [selectItem]);
+
+  /* 클릭 시 폴더 정보 가져오기. */
+  const onClick = (e, id) => {
+    if (selectItem !== id) {
+      if (parent_path === id) setSelectItem(null);
+      else setSelectItem(id);
+    }
+  };
+
+  /* 더블 클릭 시 현재 폴더 경로 변경. */
+  const onDoubleClick = (e, id) => {
+    if (loading === false) {
+      if (id === parent_path) {
+        setWorkDir(workDir.slice(0, -1));
+        setLoading(true);
+      } else {
+        setWorkDir([...workDir, id]);
+        setLoading(true);
+      }
     }
   }
-  
-  /* 서버로 경로 정보 전달. */
-  getMessage(topic, dest, path) {
-    return new Promise(async (resolve, reject) => {
-      if (!this.stomp || !this.stomp.connected) {
-        try {
-          await this.connect();
-        } catch (err) {
-          return reject(err);
-        }
-      }
 
-      /* topic 구독. */
-      const subscription = this.stomp.subscribe(topic, (msg) => {
-        console.log(topic, dest, '수신');
-        if (msg.body) {
-          const results = JSON.parse(msg.body);
-          resolve(results);
-          subscription.unsubscribe();
-        }
-      });
+  /* 연속 리스트 버튼 생성. */
+  const nameList = content.map((name) =>
+    <ListItemButton key={name}
+      selected={selectItem === name}
+      onClick={(e) => onClick(e, name)}
+      onDoubleClick={(e) => onDoubleClick(e, name)}>
+      {name}
+    </ListItemButton>
+  );
 
-      /* 엔드 포인트 /fs로 정보 전송. */
-      this.stomp.publish({
-        destination: dest,
-        body: JSON.stringify({path: path}),
-      });
-      console.log(topic, dest, '전송');
-    });
-  }
+  return(
+    <List sx={{padding:'0px', width: '100%', overflowY: 'auto'}}>
+      {nameList}
+    </List>
+  );
 }
 
-async function getDirectFolders(path) {
-  const socket = new SockJS(url);
-  const browser = new FileBrowser(socket);
-  console.log('직접 하위 폴더 탐색 요청');
-
-  try {
-    const result = await browser.getMessage(topic_fs, dest_fs_dir_folder, path);
-    return (result.folder) ? result.folder : [];
-  } catch (err) {
-    console.err('파일 탐색기 오류:', err);
-    return [];
-  } finally {
-    browser.disconnected();
-  }
-}
-
-export {getDirectFolders};
+export {FolderBrowser};

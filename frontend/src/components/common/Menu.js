@@ -23,20 +23,26 @@ function LanguageButton({name}) {
 };
 
 function RunButton({name}) {
-  /* 선택한 벤치마크 ID, 변수 ID. */
-  const {benchmarkId, variableId} = useProgramContext();
+  /* 선택한 벤치마크 경로, 실행 가능성. */
+  const {benchmarkPath, runnable} = useProgramContext();
 
   /* 버튼 클릭 시 동작. */
   const onClick = () => {
-    /* 벤치마크, 변수를 선택하면 수행. */
-    if (benchmarkId && variableId) {
-      /* Todo: 능동학습 수행 페이지로 이동. */
-      console.log('선택한 벤치마크:', benchmarkId, variableId);
+    /* Todo: 실행 가능한 벤치마크를 선택하면 실행 페이지로 이동. */
+    if (runnable === true) {
+      console.log('선택한 벤치마크:', benchmarkPath);
     }
   };
 
   return (
     <Button onClick={onClick}>{name}</Button>
+  );
+}
+
+function ResultButton({name}) {
+  /* Todo: 결과 페이지 이동 기능 추가. */
+  return(
+    <Button disabled>{name}</Button>
   );
 }
 

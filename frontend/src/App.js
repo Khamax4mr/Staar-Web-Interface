@@ -1,5 +1,6 @@
 import {lazy, Suspense} from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import {ProgramContextProvider} from './components/active-learn/ProgramContext';
 
 const BMSelector = lazy(() => import('./pages/BMSelector'));
 
@@ -8,9 +9,11 @@ const App = () => (
   // <BrowserRouter basename={process.env.PUBLIC_URL}>
   <BrowserRouter>
     <Suspense fallback={<div>Loading...</div>}>
-      <Routes>
-        <Route path='/' element={<BMSelector/>}/>
-      </Routes>
+      <ProgramContextProvider>
+        <Routes>
+          <Route path='/' element={<BMSelector/>}/>
+        </Routes>
+      </ProgramContextProvider>
     </Suspense>
   </BrowserRouter>
 )
