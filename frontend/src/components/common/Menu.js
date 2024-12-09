@@ -1,3 +1,4 @@
+import {useNavigate} from 'react-router-dom';
 import {useProgramContext} from '../active-learn/ProgramContext';
 import {Bar, Button, Container, Title} from '../../layouts/Menu';
 
@@ -25,11 +26,13 @@ function LanguageButton({name}) {
 function RunButton({name}) {
   /* 선택한 벤치마크 경로, 실행 가능성. */
   const {benchmarkPath, runnable} = useProgramContext();
+  const navigate = useNavigate();
 
   /* 버튼 클릭 시 동작. */
   const onClick = () => {
-    /* Todo: 실행 가능한 벤치마크를 선택하면 실행 페이지로 이동. */
+    /* 실행 가능한 벤치마크를 선택하면 실행 페이지로 이동. */
     if (runnable === true) {
+      navigate('/run');
       console.log('선택한 벤치마크:', benchmarkPath);
     }
   };
@@ -69,4 +72,14 @@ function FooterSelectMenu() {
   );
 }
 
-export {HeaderSimpleMenu, FooterSelectMenu};
+function FooterRunnerMenu() {
+  return(
+    <Container sx={{top: 'auto', bottom: 0}}>
+      <Bar>
+        <ResultButton name='결과 보기'/>
+      </Bar>
+    </Container>
+  );
+}
+
+export {HeaderSimpleMenu, FooterSelectMenu, FooterRunnerMenu};
