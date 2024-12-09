@@ -5,10 +5,14 @@ const ProgramContext = createContext();
 /* 프로그램 컨텍스트 적용 범위 설정용 제공자. */
 function ProgramContextProvider({children}) {
   const [benchmarkPath, setBenchmarkPath] = useState([]);
+  const [benchmarkDesc, setBenchmarkDesc] = useState(null);
+  const [runnable, setRunnable] = useState(false);
 
   return (
     <ProgramContext.Provider value={{
-        benchmarkPath, setBenchmarkPath}}>
+        benchmarkPath, setBenchmarkPath,
+        benchmarkDesc, setBenchmarkDesc,
+        runnable, setRunnable}}>
       {children}
     </ProgramContext.Provider>
   );

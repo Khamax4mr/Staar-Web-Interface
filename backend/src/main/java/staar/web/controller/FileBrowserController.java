@@ -1,6 +1,7 @@
 package staar.web.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import staar.fs.ExcludeRule;
 import staar.fs.FileBrowser;
 import staar.fs.common.Const.PATH;
 import staar.fs.common.Const.TYPE;
+import staar.fs.tree.FileItem;
 import staar.fs.tree.FileTreeItemFactory;
 import staar.fs.tree.FileTreeVisitor;
 import staar.fs.tree.FolderItem;
@@ -69,6 +71,45 @@ public class FileBrowserController {
       return mapper.writeValueAsString(result);
     } catch (JsonProcessingException e) {
       System.out.println(Err_Processing);
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+ /** msg에서 path 키의 값에 해당하는 경로의 파일을 반환합니다.
+   * /fs를 구독한 클라이언트를 대상으로 /fs/file 엔드 포인트 동작을 수행합니다.
+   * @param msg Json 형식 문자열
+   * @return 폴더 이름 목록 Json 형식 문자열 */
+  @MessageMapping(ENDPOINT.FILE)
+  @SendTo(TOPIC.FS)
+  public String getFile(String msg) {
+    System.out.println(String.format(Msg_Publish, ENDPOINT.FILE, TOPIC.FS));
+
+    /* path 키 값이 없으면 null을 반환하며 종료. */
+    final Map<String, Object> json = convert2Map(msg);
+    if (!json.containsKey(KEY.PATH)) return null;
+
+    /* 파일을 찾을 수 없으면 null을 반환하며 종료. */
+    final String path = json.get(KEY.PATH).toString();
+    final File targetFile = FileBrowser.getInstance().search(path);
+    if (targetFile == null) return null;
+
+    /* 파일 구성 요소를 만들지 못하면 null을 반환하며 종료. */
+    final FileItem targetItem = (FileItem)new FileTreeItemFactory().createItem(targetFile);
+    if (targetItem == null) return null;
+
+    /* 파일 정보 기록. */
+    final Map<String, Object> result = new HashMap<>();
+    result.putAll(targetItem.toJson(new FileTreeVisitor()));
+
+    /* 구독 클라이언트에게 파일 메세지 전달. */
+    try {
+      final ObjectMapper mapper = new ObjectMapper();
+      return mapper.writeValueAsString(result);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    } catch (IllegalArgumentException e) {
       e.printStackTrace();
       return null;
     }

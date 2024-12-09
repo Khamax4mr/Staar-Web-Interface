@@ -63,7 +63,7 @@ public class FileTreeItemFactory {
       final FileItem item = new FileItem(file);
       
       try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-        item.addData(reader.lines().toList());
+        item.setData(String.join("\n", reader.lines().toList()));
         reader.close();
       } catch (IOException e) {
         System.out.println(Msg_No_Readable);

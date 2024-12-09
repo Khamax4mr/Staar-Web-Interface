@@ -4,6 +4,7 @@ import SockJS from 'sockjs-client';
 let url = 'https://localhost:15535/ws';
 let topic_fs = '/fs';
 let dest_fs_dir_folder = '/fs/dir-folder';
+let dest_fs_file = '/fs/file';
 
 class FileFetcher {
   constructor(socket) {
@@ -77,7 +78,7 @@ async function getDirectFolders(path) {
 
   try {
     const result = await browser.getMessage(topic_fs, dest_fs_dir_folder, path);
-    return (result.data) ? Object.keys(result.data) : [];
+    return result;
   } catch (err) {
     console.err('파일 탐색기 오류:', err);
     return [];
@@ -86,4 +87,20 @@ async function getDirectFolders(path) {
   }
 }
 
-export {getDirectFolders};
+async function getFile(path) {
+  const socket = new SockJS(url);
+  const browser = new FileFetcher(socket);
+  console.log('지정 파일 탐색 요청');
+
+  try {
+    const result = await browser.getMessage(topic_fs, dest_fs_file, path);
+    return result;
+  } catch (err) {
+    console.err('파일 탐색기 오류:', err);
+    return null;
+  } finally {
+    browser.disconnected();
+  }
+}
+
+export {getDirectFolders, getFile};

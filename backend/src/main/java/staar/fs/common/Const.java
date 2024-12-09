@@ -19,7 +19,7 @@ public class Const {
   public static final class KEY {
     public static final String NAME = "name";
     public static final String PATH = "path";
-    public static final String IS_DIR = "Is_directory";
+    public static final String IS_DIR = "isdir";
     public static final String DATA = "data";
   }
 }
