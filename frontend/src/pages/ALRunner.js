@@ -1,6 +1,7 @@
 import {HeaderSimpleMenu, FooterRunnerMenu} from '../components/common/Menu';
 import {Frame, Title, Container, ContainerDivider} from '../layouts/Frame';
 import {TargetInfoBox, LogBox, SummaryBox} from '../components/active-learn/MessageBox';
+import {LearnLauncher} from '../components/active-learn/LearnLauncher';
 
 export default function ALRunner() {
   return(
@@ -12,6 +13,7 @@ export default function ALRunner() {
         <ContainerDivider/>
         <Title>실행 로그</Title>
         <Container minHeight='160px' bgcolor='whitesmoke' overflow='hidden'>
+          <LearnLauncher/>
           <LogBox/>
         </Container>
         <ContainerDivider/>

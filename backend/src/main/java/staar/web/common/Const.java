@@ -16,6 +16,7 @@ public final class Const {
   /* 토픽 경로. */
   public static final class TOPIC {
     public static final String FS = "/fs";
+    public static final String CMD = "/cmd";
   }
 
   /* 엔드포인트 경로. */
@@ -24,11 +25,14 @@ public final class Const {
     
     public static final String DIR_FOLDER = TOPIC.FS + "/dir-folder";
     public static final String FILE = TOPIC.FS + "/file";
+    public static final String ACTIVE_LEARN = TOPIC.CMD + "/active-learn";
+    public static final String RESULT = TOPIC.CMD + "/result";
   }
 
   /* 메세지 키. */
   public static final class KEY {
     public static final String PATH = "path";
-    public static final String FOLDER = "folder";
+    public static final String CMD = "cmd";
+    public static final String LOG = "log";
   }
 }

@@ -61,7 +61,7 @@ class FileFetcher {
         }
       });
 
-      /* 엔드 포인트 /fs로 정보 전송. */
+      /* 엔드 포인트 /fs로 정보 전송.? */
       this.stomp.publish({
         destination: dest,
         body: JSON.stringify({path: path}),

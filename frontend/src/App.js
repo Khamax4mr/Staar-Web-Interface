@@ -7,8 +7,8 @@ const ALRunner = lazy(() => import('./pages/ALRunner'));
 
 const App = () => (
   /* Github 페이지 배포 시 */
-  // <BrowserRouter basename={process.env.PUBLIC_URL}>
-  <BrowserRouter>
+  // <BrowserRouter>
+  <BrowserRouter basename={process.env.PUBLIC_URL}>
     <Suspense fallback={<div>Loading...</div>}>
       <ProgramContextProvider>
         <Routes>
